@@ -126,6 +126,9 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 5,
   },
+  selectedTile: {
+    backgroundColor: '#005bb5',
+  },
   tileText: {
     fontSize: 32,
     fontWeight: 'bold',

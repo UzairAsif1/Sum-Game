@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Button, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, Button, TouchableOpacity, Alert } from 'react-native';
 
 export default function Game() {
   const [target, setTarget] = useState<number>(0);
@@ -12,28 +12,73 @@ export default function Game() {
   };
 
   const generateNums = (count: number) => {
-    let newItems: number[] = [];
-    let sum = 0;
-
-    while (sum < target - 3) {
-      let num = Math.floor(1 + Math.random() * 15);
-      if (sum + num <= target) {
-        newItems.push(num);
-        sum += num;
+    let newItems: Set<number> = new Set(); 
+    let subsetSize = Math.random() < 0.5 ? 3 : 4; 
+    let subset: Set<number> = new Set();
+    let remainingTarget = target;
+  
+    while (remainingTarget > 0 && subset.size < subsetSize) {
+      let num = Math.floor(1 + Math.random() * 19); 
+  
+      if (!subset.has(num) && remainingTarget - num >= 0) {
+        subset.add(num);
+        remainingTarget -= num;
       }
     }
-
-    while (newItems.length < count) {
-      newItems.push(Math.floor(1 + Math.random() * 9));
+  
+    if (remainingTarget > 0) {
+      let lastNum = Array.from(subset).pop(); 
+      subset.delete(lastNum!);
+      subset.add(lastNum! + remainingTarget); 
     }
-
-    setRandomNumbers(newItems.sort(() => Math.random() - 0.5));
+  
+    newItems = new Set([...subset]);
+  
+    while (newItems.size < count) {
+      let randomNum = Math.floor(1 + Math.random() * 19);
+      if (!newItems.has(randomNum)) {
+        newItems.add(randomNum);
+      }
+    }
+  
+    let shuffledNumbers = Array.from(newItems).sort(() => Math.random() - 0.5);
+  
+    setGameStatus(''); 
+    setRandomNumbers(shuffledNumbers); 
   };
+
+  const handleTilePress = (num: number) => {
+    if (gameStatus) return; 
+
+    const newSelection = [...selectedNumbers, num];
+    const totalSum = newSelection.reduce((sum, val) => sum + val, 0);
+
+    setSelectedNumbers(newSelection);
+
+    if (totalSum === target) {
+      Alert.alert('🎉 Congratulations!', 'You hit the target!', [{ text: 'OK', onPress: () => newGame }]);
+      setGameStatus('You Win! 🎉');
+    } else if (totalSum > target) {
+      Alert.alert('❌ Game Over!', 'You exceeded the target!', [{ text: 'Try Again', onPress: () => newGame }]);
+      setGameStatus('You Lose! ❌');
+    }
+  };
+
+
+  const newGame = () => {
+    settingTarget();
+    generateNums(6);
+    setSelectedNumbers([]);
+
+  }
+  
 
   useEffect(() => {
     settingTarget();
     generateNums(6);
   }, []);
+
+
 
   return (
     <View style={styles.container}>
@@ -44,23 +89,22 @@ export default function Game() {
         <Text style={styles.target}>{target}</Text>
       </View>
 
+      {gameStatus ? <Text style={styles.status}>{gameStatus}</Text> : null}
+
       <View style={styles.tilesContainer}>
         {randomNumbers.map((num, index) => (
-          <TouchableOpacity key={index} style={styles.tile}>
+          <TouchableOpacity
+            key={index}
+            style={[styles.tile, selectedNumbers.includes(num) ? styles.selectedTile : null]}
+            onPress={() => handleTilePress(num)}
+          >
             <Text style={styles.tileText}>{num}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
       <View style={styles.buttonContainer}>
-        <Button
-          title="Retry"
-          onPress={() => {
-            settingTarget();
-            generateNums(6);
-          }}
-          color="#007AFF"
-        />
+        <Button title="New Game" onPress={newGame} color="#007AFF" />
       </View>
     </View>
   );
@@ -104,6 +148,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
     marginTop: 5,
+  },
+  status: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#ff0000',
   },
   tilesContainer: {
     flexDirection: 'row',

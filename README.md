@@ -1,16 +1,22 @@
-# Welcome to your Expo app 👋
+# Sum Game - React Native 🎯
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is a **React Native** game built using [Expo](https://expo.dev). Players select numbers to sum up to a **random target value** without exceeding it.
 
 ## Get started
 
-1. Install dependencies
+1. Clone the Repository
+
+To get a copy of the project, run:
+```bash
+git clone https://github.com/your-username/sumgame-react-native.git
+
+2. Install dependencies
 
    ```bash
    npm install
    ```
 
-2. Start the app
+3. Start the app
 
    ```bash
     npx expo start
@@ -25,15 +31,6 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
 ## Learn more
 
